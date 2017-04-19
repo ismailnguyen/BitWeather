@@ -23,3 +23,17 @@ We made the project by following these steps :
     - swith the thread
       - IHM
         - screen on weemos
+
+
+## Pin's Correspondence (ARDUINO / Screen)
+
+Weemos D1 Mini | ILI9341 Screen
+--- | --- 
+3V3 | VCC
+GND | GND
+D2 | CS
+RST | RESET
+D4 | D/C
+D7 | SDI (MOSI)
+D5 | SCK
+3V3 | LED
