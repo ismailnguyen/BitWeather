@@ -94,11 +94,25 @@ WiFiManager wifiManager;
 // Initialization with custom SSID
 ESP8266WebServer server(80);
 
+String getHTML() {
+    String updatedIndexHTML = html_index;
+    
+    /* // Add logic to replace settings variable by HTML form values
+
+    String voltage = String(analogRead(A0) * 3. / 1024.);
+
+    updatedIndexHTML.replace("xxx", voltage);
+    
+     */
+
+    return updatedIndexHTML;
+}
+
 /*
  * Set start page of web server
  */
 void handleRoot() {
-  server.send(200, "text/html", html_index);
+  server.send(200, "text/html", getHTML());
 }
 
 void setupServer() {
