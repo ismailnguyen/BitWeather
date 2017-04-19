@@ -14,3 +14,12 @@ The goal of this project is to allow a termometer accuracy. It is composed of a 
 - All in place <BR>
 [![All assemblate](http://i.imgur.com/ysy0L4u.jpg)](http://i.imgur.com/ysy0L4u.jpg)<BR>
 
+## Steps followed
+We made the project by following these steps :
+
+- Creating the weather Station :
+  - Code and hardware :
+    - Fixe the screen on the Weemos
+    - swith the thread
+      - IHM
+        - screen on weemos
