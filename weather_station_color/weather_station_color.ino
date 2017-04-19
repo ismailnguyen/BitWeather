@@ -25,7 +25,6 @@ See more at http://blog.squix.ch
 #include <SPI.h>
 #include <Wire.h>  // required even though we do not use I2C 
 #include "Adafruit_STMPE610.h"
-#include <ESP8266WebServer.h>
 
 // Additional UI functions
 #include "GfxUi.h"
@@ -37,10 +36,7 @@ See more at http://blog.squix.ch
 // Download helper
 #include "WebResource.h"
 
-#include <ESP8266WiFi.h>
 #include <ArduinoOTA.h>
-#include <ESP8266mDNS.h>
-#include <DNSServer.h>
 #include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
 #include <WiFiClient.h>
 #include <DNSServer.h>            //Local DNS Server used for redirecting all requests to the &onfiguration portal
@@ -48,12 +44,9 @@ See more at http://blog.squix.ch
 #include <WiFiManager.h>          //https://github.com/tzapu/WiFiManager WiFi Configuration Magic
 #include <ESP8266mDNS.h>          //Allow custom URL
 
-
-// Helps with connecting to internet
-#include <WiFiManager.h>
-
-// check settings.h for adapting to your needs
+// Application settings
 #include "settings.h"
+
 #include <JsonListener.h>
 #include <WundergroundClient.h>
 #include "TimeClient.h"
@@ -63,10 +56,6 @@ See more at http://blog.squix.ch
 
 // HOSTNAME for OTA update
 #define HOSTNAME "ESP8266-OTA-"
-
-/*****************************
- * Important: see settings.h to configure your settings!!!
- * ***************************/
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 GfxUi ui = GfxUi(&tft);
@@ -97,11 +86,64 @@ void sleepNow(int wakeup);
 
 long lastDownloadUpdate = millis();
 
-
 //WiFiManager
 //Local intialization. Once its business is done, there is no need to keep it around
 WiFiManager wifiManager;
+
+// Web server
+// Initialization with custom SSID
+ESP8266WebServer server(80);
+
+/*
+ * Set start page of web server
+ */
+void handleRoot() {
+  server.send(200, "text/html", html_index);
+}
+
+void setupServer() {
+  // Set root page
+  server.on("/", handleRoot);
+
+  // Start web server
+  server.begin();
+
+  Serial.println("HTTP server started");
+}
+
+void setupMDNS() {
+    // Add service to MDNS-SD to access the ESP with the URL http://<ssid>.local
+    if (MDNS.begin(ssid)) {
+        Serial.print("MDNS responder started as http://");
+        Serial.print(ssid);
+        Serial.println(".local");
+    }
+    MDNS.addService("http", "tcp", 8080);
+}
+
+void setupWifi() {
+  //Manual Wifi
+  //WiFi.begin(WIFI_SSID, WIFI_PWD);
   
+  //WiFiManager
+  WiFiManager wifiManager;
+
+  //reset saved settings -- Flush flash
+  //wifiManager.resetSettings();
+
+  //set callback that gets called when connecting to previous WiFi fails, and enters Access Point mode
+  wifiManager.setAPCallback(configModeCallback);
+
+  //fetches ssid and pass from eeprom and tries to connect
+  //if it does not connect it starts an access point with the specified name
+  //and goes into a blocking loop awaiting configuration
+  wifiManager.autoConnect(ssid);
+
+  // might seem redundant but it's not printed the 1st time:
+  Serial.println("local ip");
+  Serial.println(WiFi.localIP());
+}
+
 void setup() {
   Serial.begin(115200);
 
@@ -130,15 +172,7 @@ void setup() {
   ui.setTextAlignment(CENTER);
   ui.drawString(120, 160, "Connecting to WiFi");
 
-  // Uncomment for testing wifi manager
-  //wifiManager.resetSettings();
-  wifiManager.setAPCallback(configModeCallback);
-
-  //or use this for auto generated name ESP + ChipID
-  wifiManager.autoConnect();
-
-  //Manual Wifi
-  //WiFi.begin(WIFI_SSID, WIFI_PWD);
+  setupWifi();
 
   // OTA Setup
   String hostname(HOSTNAME);
@@ -157,19 +191,27 @@ void setup() {
   // load the weather information
   updateData();
 
-    Serial.println("Setup OK.");
+  setupServer();
+  setupMDNS();
+  
+  Serial.println("Setup OK.");
 }
 
 long lastDrew = 0;
 
 
 void loop() {
-  if (USE_TOUCHSCREEN_WAKE) {     // determine in settings.h!
+  
+  if (USE_TOUCHSCREEN_WAKE) {     // determine in settings.h
     
     // for AWAKE_TIME seconds we'll hang out and wait for OTA updates
     for (uint16_t i=0; i<AWAKE_TIME; i++  ) {
       // Handle OTA update requests
       ArduinoOTA.handle();
+
+      // Handle web client requests
+      server.handleClient();
+      
       delay(10000);
       yield();
     }
@@ -205,6 +247,9 @@ void loop() {
   {
     // Handle OTA update requests
     ArduinoOTA.handle();
+
+    // Handle web client requests
+      server.handleClient();
 
     // Check if we should update the clock
     if (millis() - lastDrew > 30000 && wunderground.getSeconds() == "00") {
