@@ -58,7 +58,8 @@ See more at http://blog.squix.ch
 #include <WundergroundClient.h>
 #include "TimeClient.h"
 
-
+// Include home html page
+#include "html.h"
 
 // HOSTNAME for OTA update
 #define HOSTNAME "ESP8266-OTA-"
