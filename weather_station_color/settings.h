@@ -25,8 +25,8 @@ boolean DEEP_SLEEP = false;                 // use the touchscreen for deep slee
 int     AWAKE_TIME = 5;                   // how many seconds to stay 'awake' before going back to zzz
 String SUN = "Soleil";
 String LUNAR = "Lune";
-const char *ssid = "weather_station"; // Wifi network SSID
-
+const char *ssid = "BitWeather"; // Wifi network SSID
+boolean ACTUAL_TEMP = true;
 
 // Pins for the ILI9341
 #define TFT_DC 2

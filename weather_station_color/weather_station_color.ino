@@ -44,6 +44,10 @@ See more at http://blog.squix.ch
 #include <WiFiManager.h>          //https://github.com/tzapu/WiFiManager WiFi Configuration Magic
 #include <ESP8266mDNS.h>          //Allow custom URL
 
+#include "DHT.h"
+
+#define DHTPIN D3 
+#define DHTTYPE DHT11   // DHT 11
 // Application settings
 #include "settings.h"
 
@@ -86,6 +90,7 @@ void sleepNow(int wakeup);
 
 long lastDownloadUpdate = millis();
 
+DHT dht(DHTPIN, DHTTYPE);
 //WiFiManager
 //Local intialization. Once its business is done, there is no need to keep it around
 WiFiManager wifiManager;
@@ -160,7 +165,7 @@ void setupWifi() {
 
 void setup() {
   Serial.begin(115200);
-
+  dht.begin();
   if (! spitouch.begin()) {
     Serial.println("STMPE not found?");
   }
@@ -266,8 +271,11 @@ void loop() {
       server.handleClient();
 
     // Check if we should update the clock
-    if (millis() - lastDrew > 30000 && wunderground.getSeconds() == "00") {
+    if (millis() - lastDrew > 30000) {
       drawTime();
+      if (ACTUAL_TEMP) {
+        drawTemp();
+      }
       lastDrew = millis();
     }
 
@@ -351,7 +359,9 @@ void updateData() {
   drawTime();
   drawCurrentWeather();
   drawForecast();
-  drawAstronomy();
+  if (!ACTUAL_TEMP) {
+    drawAstronomy();
+  }
 }
 
 // Progress bar helper
@@ -394,7 +404,7 @@ void drawCurrentWeather() {
   ui.setTextAlignment(RIGHT);
   String degreeSign = "F";
   if (IS_METRIC) {
-    degreeSign = "C";
+    degreeSign = ".C";
   }
   String temp = wunderground.getCurrentTemp() + degreeSign;
   ui.drawString(220, 125, temp);
@@ -449,6 +459,45 @@ void drawAstronomy() {
   ui.drawString(220, 300, wunderground.getMoonsetTime());
   
 }
+
+// draw moonphase and sunrise/set and moonrise/set
+void drawTemp() {
+  
+  ui.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
+  tft.setFont(&ArialRoundedMTBold_14);  
+  ui.setTextAlignment(LEFT);
+  ui.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
+  ui.drawString(20, 270, "Temp.");
+  ui.setTextAlignment(RIGHT);
+  ui.drawString(220, 270, "Humi.");
+  ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
+
+  float h = dht.readHumidity();
+  // Read temperature as Celsius (the default)
+  float t = dht.readTemperature();
+
+  
+  Serial.println("TEMP");
+  Serial.println(t);
+  Serial.println("HUMI");
+  Serial.println(h);
+
+  String result_t = "0.C";
+  String result_h = "0 %";
+
+  if (h > 0.0 && h < 110.0 && t > -1 && t < 150) {
+    result_t.replace("0", static_cast<String>(static_cast<int>(t)));
+    result_h.replace("0", static_cast<String>(static_cast<int>(h)));
+  }
+  
+  ui.setTextAlignment(LEFT);
+  tft.setFont(&ArialRoundedMTBold_36);  
+  ui.drawString(20, 300, result_t);
+  ui.setTextAlignment(RIGHT);
+  ui.drawString(220, 300, result_h);
+  
+}
+
 
 // Helper function, should be part of the weather station library and should disappear soon
 String getMeteoconIcon(String iconText) {
