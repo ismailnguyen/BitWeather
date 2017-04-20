@@ -134,6 +134,24 @@ String getHTML() {
     return updatedIndexHTML;
 }
 
+void handleSettings() {
+  // Update settings with form values
+  current_WUNDERGRROUND_API_KEY = server.arg("api_key");
+  current_WUNDERGROUND_CITY = server.arg("city");
+  current_WUNDERGROUND_CITY_CODE = server.arg("city_code");
+  current_UTC_OFFSET = server.arg("utc_offset").toFloat();
+  
+  if (server.arg("temperature") == "C") {
+    current_IS_METRIC = true;
+  }
+  else {
+    current_IS_METRIC = false;
+  }
+
+  // Return settings page with updated values
+  handleRoot();
+}
+
 /*
  * Set start page of web server
  */
@@ -145,6 +163,9 @@ void setupServer() {
   // Set root page
   server.on("/", handleRoot);
 
+  // Settings update endpoint
+  server.on("/update", handleSettings);
+  
   // Start web server
   server.begin();
 
