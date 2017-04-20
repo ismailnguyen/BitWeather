@@ -25,66 +25,66 @@ See more at http://blog.squix.ch
 
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
-#include "WundergroundClient.h"
+#include "WundergroundClient2.h"
 bool usePM = false; // Set to true if you want to use AM/PM time disaply
 bool isPM = false; // JJG added ///////////
 
-WundergroundClient::WundergroundClient(boolean _isMetric) {
+WundergroundClient2::WundergroundClient2(boolean _isMetric) {
   isMetric = _isMetric;
 }
 
 // Added by fowlerk, 12/22/16, as an option to change metric setting other than at instantiation
-void WundergroundClient::initMetric(boolean _isMetric) {
+void WundergroundClient2::initMetric(boolean _isMetric) {
   isMetric = _isMetric;
 }
 // end add fowlerk, 12/22/16
 
-void WundergroundClient::updateConditions(String apiKey, String language, String country, String city) {
+void WundergroundClient2::updateConditions(String apiKey, String language, String country, String city) {
   isForecast = false;
   doUpdate("/api/" + apiKey + "/conditions/lang:" + language + "/q/" + country + "/" + city + ".json");
 }
 
 // wunderground change the API URL scheme:
 // http://api.wunderground.com/api/<API-KEY>/conditions/lang:de/q/zmw:00000.215.10348.json
-void WundergroundClient::updateConditions(String apiKey, String language, String zmwCode) {
+void WundergroundClient2::updateConditions(String apiKey, String language, String zmwCode) {
   isForecast = false;
   doUpdate("/api/" + apiKey + "/conditions/lang:" + language + "/q/zmw:" + zmwCode + ".json");
 }
 
-void WundergroundClient::updateConditionsPWS(String apiKey, String language, String pws) {
+void WundergroundClient2::updateConditionsPWS(String apiKey, String language, String pws) {
   isForecast = false;
   doUpdate("/api/" + apiKey + "/conditions/lang:" + language + "/q/pws:" + pws + ".json");
 }
 
-void WundergroundClient::updateForecast(String apiKey, String language, String country, String city) {
+void WundergroundClient2::updateForecast(String apiKey, String language, String country, String city) {
   isForecast = true;
   doUpdate("/api/" + apiKey + "/forecast10day/lang:" + language + "/q/" + country + "/" + city + ".json");
 }
 
 
-void WundergroundClient::updateForecastPWS(String apiKey, String language, String pws) {
+void WundergroundClient2::updateForecastPWS(String apiKey, String language, String pws) {
   isForecast = true;
   doUpdate("/api/" + apiKey + "/forecast10day/lang:" + language + "/q/pws:" + pws + ".json");
 }
 
-void WundergroundClient::updateForecastZMW(String apiKey, String language, String zmwCode) {
+void WundergroundClient2::updateForecastZMW(String apiKey, String language, String zmwCode) {
   isForecast = true;
   doUpdate("/api/" + apiKey + "/forecast10day/lang:" + language + "/q/zmw:" + zmwCode + ".json");
 }
 
 // JJG added ////////////////////////////////
-void WundergroundClient::updateAstronomy(String apiKey, String language, String country, String city) {
+void WundergroundClient2::updateAstronomy(String apiKey, String language, String country, String city) {
   isForecast = true;
   doUpdate("/api/" + apiKey + "/astronomy/lang:" + language + "/q/" + country + "/" + city + ".json");
 }
 // end JJG add  ////////////////////////////////////////////////////////////////////
 
-void WundergroundClient::updateAstronomyPWS(String apiKey, String language, String pws) {
+void WundergroundClient2::updateAstronomyPWS(String apiKey, String language, String pws) {
   isForecast = true;
   doUpdate("/api/" + apiKey + "/astronomy/lang:" + language + "/q/pws:" + pws + ".json");
 }
 // fowlerk added
-void WundergroundClient::updateAlerts(String apiKey, String language, String country, String city) {
+void WundergroundClient2::updateAlerts(String apiKey, String language, String country, String city) {
   currentAlert = 0;
   activeAlertsCnt = 0;
   isForecast = false;
@@ -102,7 +102,7 @@ void WundergroundClient::updateAlerts(String apiKey, String language, String cou
 }
 // end fowlerk add
 
-void WundergroundClient::updateAlertsPWS(String apiKey, String language, String country, String pws) {
+void WundergroundClient2::updateAlertsPWS(String apiKey, String language, String country, String pws) {
   currentAlert = 0;
   activeAlertsCnt = 0;
   isForecast = false;
@@ -119,7 +119,7 @@ void WundergroundClient::updateAlertsPWS(String apiKey, String language, String 
   doUpdate("/api/" + apiKey + "/alerts/lang:" + language + "/q/pws:" + pws + ".json");
 }
 
-void WundergroundClient::doUpdate(String url) {
+void WundergroundClient2::doUpdate(String url) {
   JsonStreamingParser parser;
   parser.setListener(this);
   WiFiClient client;
@@ -164,15 +164,15 @@ void WundergroundClient::doUpdate(String url) {
   }
 }
 
-void WundergroundClient::whitespace(char c) {
+void WundergroundClient2::whitespace(char c) {
   Serial.println("whitespace");
 }
 
-void WundergroundClient::startDocument() {
+void WundergroundClient2::startDocument() {
   Serial.println("start document");
 }
 
-void WundergroundClient::key(String key) {
+void WundergroundClient2::key(String key) {
   currentKey = String(key);
 //  Restructured following logic to accomodate the multiple types of JSON returns based on the API.  This was necessary since several
 //  keys are reused between various types of API calls, resulting in confusing returns in the original function.  Various booleans
@@ -209,7 +209,7 @@ void WundergroundClient::key(String key) {
 // end fowlerk add
 }
 
-void WundergroundClient::value(String value) {
+void WundergroundClient2::value(String value) {
   if (currentKey == "local_epoch") {
     localEpoc = value.toInt();
     localMillisAtUpdate = millis();
@@ -531,29 +531,29 @@ void WundergroundClient::value(String value) {
 
 }
 
-void WundergroundClient::endArray() {
+void WundergroundClient2::endArray() {
 
 }
 
 
-void WundergroundClient::startObject() {
+void WundergroundClient2::startObject() {
   currentParent = currentKey;
 }
 
-void WundergroundClient::endObject() {
+void WundergroundClient2::endObject() {
   currentParent = "";
 }
 
-void WundergroundClient::endDocument() {
+void WundergroundClient2::endDocument() {
 
 }
 
-void WundergroundClient::startArray() {
+void WundergroundClient2::startArray() {
 
 }
 
 
-String WundergroundClient::getHours() {
+String WundergroundClient2::getHours() {
     if (localEpoc == 0) {
       return "--";
     }
@@ -564,7 +564,7 @@ String WundergroundClient::getHours() {
     return String(hours); // print the hour (86400 equals secs per day)
 
 }
-String WundergroundClient::getMinutes() {
+String WundergroundClient2::getMinutes() {
     if (localEpoc == 0) {
       return "--";
     }
@@ -575,7 +575,7 @@ String WundergroundClient::getMinutes() {
     }
     return String(minutes);
 }
-String WundergroundClient::getSeconds() {
+String WundergroundClient2::getSeconds() {
     if (localEpoc == 0) {
       return "--";
     }
@@ -586,184 +586,184 @@ String WundergroundClient::getSeconds() {
     }
     return String(seconds);
 }
-String WundergroundClient::getDate() {
+String WundergroundClient2::getDate() {
   return date;
 }
-String WundergroundClient::getObservationDate() {
+String WundergroundClient2::getObservationDate() {
   return observationDate;
 }
-long WundergroundClient::getCurrentEpoch() {
+long WundergroundClient2::getCurrentEpoch() {
   return localEpoc + ((millis() - localMillisAtUpdate) / 1000);
 }
 
 // JJG added ... /////////////////////////////////////////////////////////////////////////////////////////
-String WundergroundClient::getMoonPctIlum() {
+String WundergroundClient2::getMoonPctIlum() {
   return moonPctIlum;
 }
 
-String WundergroundClient::getMoonAge() {
+String WundergroundClient2::getMoonAge() {
   return moonAge;
 }
 
-String WundergroundClient::getMoonPhase() {
+String WundergroundClient2::getMoonPhase() {
   return moonPhase;
 }
 
-String WundergroundClient::getSunriseTime() {
+String WundergroundClient2::getSunriseTime() {
   return sunriseTime;
  }
 
-String WundergroundClient::getSunsetTime() {
+String WundergroundClient2::getSunsetTime() {
   return sunsetTime;
  }
 
-String WundergroundClient::getMoonriseTime() {
+String WundergroundClient2::getMoonriseTime() {
   return moonriseTime;
  }
 
-String WundergroundClient::getMoonsetTime() {
+String WundergroundClient2::getMoonsetTime() {
   return moonsetTime;
  }
 
-String WundergroundClient::getWindSpeed() {
+String WundergroundClient2::getWindSpeed() {
   return windSpeed;
  }
 
-String WundergroundClient::getWindDir() {
+String WundergroundClient2::getWindDir() {
   return windDir;
  }
 
  // end JJG add ////////////////////////////////////////////////////////////////////////////////////////////
 
 
-String WundergroundClient::getCurrentTemp() {
+String WundergroundClient2::getCurrentTemp() {
   return currentTemp;
 }
 
-String WundergroundClient::getWeatherText() {
+String WundergroundClient2::getWeatherText() {
   return weatherText;
 }
 
-String WundergroundClient::getHumidity() {
+String WundergroundClient2::getHumidity() {
   return humidity;
 }
 
-String WundergroundClient::getPressure() {
+String WundergroundClient2::getPressure() {
   return pressure;
 }
 
-String WundergroundClient::getDewPoint() {
+String WundergroundClient2::getDewPoint() {
   return dewPoint;
 }
 // fowlerk added...
-String WundergroundClient::getFeelsLike() {
+String WundergroundClient2::getFeelsLike() {
   return feelslike;
 }
 
-String WundergroundClient::getUV() {
+String WundergroundClient2::getUV() {
   return UV;
 }
 
 // Added by fowlerk, 04-Dec-2016
-String WundergroundClient::getObservationTime() {
+String WundergroundClient2::getObservationTime() {
   return observationTime;
 }
 
 // Active alerts...added 18-Dec-2016
-String WundergroundClient::getActiveAlerts(int alertIndex) {
+String WundergroundClient2::getActiveAlerts(int alertIndex) {
   return activeAlerts[alertIndex];
 }
 
-String WundergroundClient::getActiveAlertsText(int alertIndex) {
+String WundergroundClient2::getActiveAlertsText(int alertIndex) {
   return activeAlertsText[alertIndex];
 }
 
-String WundergroundClient::getActiveAlertsMessage(int alertIndex) {
+String WundergroundClient2::getActiveAlertsMessage(int alertIndex) {
   return activeAlertsMessage[alertIndex];
 }
 
-bool WundergroundClient::getActiveAlertsMessageTrunc(int alertIndex) {
+bool WundergroundClient2::getActiveAlertsMessageTrunc(int alertIndex) {
   return activeAlertsMessageTrunc[alertIndex];
 }
 
-String WundergroundClient::getActiveAlertsStart(int alertIndex) {
+String WundergroundClient2::getActiveAlertsStart(int alertIndex) {
   return activeAlertsStart[alertIndex];
 }
 
-String WundergroundClient::getActiveAlertsEnd(int alertIndex) {
+String WundergroundClient2::getActiveAlertsEnd(int alertIndex) {
   return activeAlertsEnd[alertIndex];
 }
 
-String WundergroundClient::getActiveAlertsPhenomena(int alertIndex) {
+String WundergroundClient2::getActiveAlertsPhenomena(int alertIndex) {
   return activeAlertsPhenomena[alertIndex];
 }
 
-String WundergroundClient::getActiveAlertsSignificance(int alertIndex) {
+String WundergroundClient2::getActiveAlertsSignificance(int alertIndex) {
   return activeAlertsSignificance[alertIndex];
 }
 
-String WundergroundClient::getActiveAlertsAttribution(int alertIndex) {
+String WundergroundClient2::getActiveAlertsAttribution(int alertIndex) {
   return activeAlertsAttribution[alertIndex];
 }
 
-int WundergroundClient::getActiveAlertsCnt() {
+int WundergroundClient2::getActiveAlertsCnt() {
   return activeAlertsCnt;
 }
 
 // end fowlerk add
 
 
-String WundergroundClient::getPrecipitationToday() {
+String WundergroundClient2::getPrecipitationToday() {
   return precipitationToday;
 }
 
-String WundergroundClient::getTodayIcon() {
+String WundergroundClient2::getTodayIcon() {
   return getMeteoconIcon(weatherIcon);
 }
 
-String WundergroundClient::getTodayIconText() {
+String WundergroundClient2::getTodayIconText() {
   return weatherIcon;
 }
 
-String WundergroundClient::getForecastIcon(int period) {
+String WundergroundClient2::getForecastIcon(int period) {
   return getMeteoconIcon(forecastIcon[period]);
 }
 
-String WundergroundClient::getForecastTitle(int period) {
+String WundergroundClient2::getForecastTitle(int period) {
   return forecastTitle[period];
 }
 
-String WundergroundClient::getForecastLowTemp(int period) {
+String WundergroundClient2::getForecastLowTemp(int period) {
   return forecastLowTemp[period];
 }
 
-String WundergroundClient::getForecastHighTemp(int period) {
+String WundergroundClient2::getForecastHighTemp(int period) {
   return forecastHighTemp[period];
 }
 // fowlerk added...
-String WundergroundClient::getForecastDay(int period) {
+String WundergroundClient2::getForecastDay(int period) {
 //  Serial.print("Day period:  "); Serial.println(period);
   return forecastDay[period];
 }
 
-String WundergroundClient::getForecastMonth(int period) {
+String WundergroundClient2::getForecastMonth(int period) {
 //  Serial.print("Month period:  "); Serial.println(period);
   return forecastMonth[period];
 }
 
-String WundergroundClient::getForecastText(int period) {
+String WundergroundClient2::getForecastText(int period) {
 //  Serial.print("Forecast period:  "); Serial.println(period);
   return forecastText[period];
 }
 
 // Added PoP...12/22/16
-String WundergroundClient::getPoP(int period) {
+String WundergroundClient2::getPoP(int period) {
   return PoP[period];
 }
 // end fowlerk add
 
 
-String WundergroundClient::getMeteoconIcon(String iconText) {
+String WundergroundClient2::getMeteoconIcon(String iconText) {
   if (iconText == "chanceflurries") return "F";
   if (iconText == "chancerain") return "Q";
   if (iconText == "chancesleet") return "W";

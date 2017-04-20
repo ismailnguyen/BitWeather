@@ -33,7 +33,7 @@ See more at http://blog.squix.ch
 
 #define MAX_WEATHER_ALERTS 6     // The maximum number of concurrent weather alerts supported by the library
 
-class WundergroundClient: public JsonListener {
+class WundergroundClient2: public JsonListener {
   private:
     String currentKey;
     String currentParent = "";
@@ -101,7 +101,7 @@ class WundergroundClient: public JsonListener {
   // end fowlerk add
 
   public:
-    WundergroundClient(boolean isMetric);
+    WundergroundClient2(boolean isMetric);
     void updateConditions(String apiKey, String language, String country, String city);
     void updateConditions(String apiKey, String language, String zmwCode);
     void updateConditionsPWS(String apiKey, String language, String pws);
