@@ -99,16 +99,37 @@ WiFiManager wifiManager;
 // Initialization with custom SSID
 ESP8266WebServer server(80);
 
+// Initialisation of default settings from HTML setting screen
+String current_WUNDERGRROUND_API_KEY = WUNDERGRROUND_API_KEY;
+String current_WUNDERGROUND_CITY = WUNDERGROUND_CITY;
+String current_WUNDERGROUND_CITY_CODE = WUNDERGROUND_CITY_CODE;
+float current_UTC_OFFSET = UTC_OFFSET;
+boolean current_IS_METRIC = IS_METRIC;
+
 String getHTML() {
     String updatedIndexHTML = html_index;
     
-    /* // Add logic to replace settings variable by HTML form values
+    updatedIndexHTML.replace("[HTML_VALUE_API_KEY]", current_WUNDERGRROUND_API_KEY);
+    updatedIndexHTML.replace("[HTML_VALUE_CITY]", current_WUNDERGROUND_CITY);
+    updatedIndexHTML.replace("[HTML_VALUE_CITY_CODE]", current_WUNDERGROUND_CITY_CODE);
 
-    String voltage = String(analogRead(A0) * 3. / 1024.);
+    String current_UTC_OFFSET_string = static_cast<String>(static_cast<int>(current_UTC_OFFSET));
+    String current_UTC_OFFSET_HTML = "<option value='" + current_UTC_OFFSET_string + "'>" + current_UTC_OFFSET_string + "</option>";
+    String new_UTC_OFFSET_HTML = "<option value='" + current_UTC_OFFSET_string + "' selected>" + current_UTC_OFFSET_string + "</option>";
+      
+    updatedIndexHTML.replace(current_UTC_OFFSET_HTML, new_UTC_OFFSET_HTML);
 
-    updatedIndexHTML.replace("xxx", voltage);
-    
-     */
+    String current_IS_METRIC_HTML = "";
+    String new_IS_METRIC_HTML = "";
+    if (current_IS_METRIC) {
+      current_IS_METRIC_HTML = "<option value='C'>&#8451;</option>";
+      new_IS_METRIC_HTML = "<option value='C' selected>&#8451;</option>";
+    } 
+    else {
+      current_IS_METRIC_HTML = "<option value='F'>&#8457;</option>";
+      new_IS_METRIC_HTML = "<option value='F' selected>&#8457;</option>";
+    }
+    updatedIndexHTML.replace(current_IS_METRIC_HTML, new_IS_METRIC_HTML);
 
     return updatedIndexHTML;
 }

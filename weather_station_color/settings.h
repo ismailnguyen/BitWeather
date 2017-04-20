@@ -45,6 +45,7 @@ const String WUNDERGRROUND_API_KEY = "597068b00486e812";
 const String WUNDERGRROUND_LANGUAGE = "FR";
 const String WUNDERGROUND_COUNTRY = "FR";
 const String WUNDERGROUND_CITY = "SEUGY";
+const String WUNDERGROUND_CITY_CODE = "SEUGY";
 
 //Thingspeak Settings
 const String THINGSPEAK_CHANNEL_ID = "67284";
