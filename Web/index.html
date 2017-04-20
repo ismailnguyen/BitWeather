@@ -21,7 +21,7 @@
 </head>
 <body class='bg-black'>
 	
-<form action='post' action='/update'>
+<form method='post' action='/update'>
 	
 	<div class='grid'>
 		<div class='row'>
@@ -40,7 +40,7 @@
 			<div class='cell'>
 				<div class='input-control text fg-grayLight'>
 					<label for='api_key'>Cl&eacute; API</label>
-					<input type='text' name='api_key' />
+					<input type='text' name='api_key' value='[HTML_VALUE_API_KEY]' />
 				</div>
 			</div>
 		</div>
@@ -49,8 +49,8 @@
 			<div class='cell'>
 				<div class='input-control text fg-grayLight'>
 					<label for='city'>Ville</label>
-					<input type='text' id='city' name='city' />
-					<input type='hidden' id='city_code' name='city_code' />
+					<input type='text' id='city' name='city' value='[HTML_VALUE_CITY]' />
+					<input type='hidden' id='city_code' name='city_code' value='[HTML_VALUE_CITY_CODE]' />
 				</div>
 			</div>
 		</div>
@@ -154,7 +154,7 @@ function getAutoCompleteValues(val) {
 	else {
 		for (i in data.RESULTS) {
 		  var city = data.RESULTS[i]['name'];
-		  var cityCode = data.RESULTS[i]['l'];
+		  var cityCode = data.RESULTS[i]['l'].split(':')[1];
 		  
 		  availableCities.push({ label: city, value: cityCode });
 		}

@@ -388,12 +388,12 @@ void updateData() {
   drawProgress(20, "Updating time...");
   timeClient.updateTime();
   drawProgress(50, "Updating conditions...");
-  //wunderground.updateConditions(WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_COUNTRY, WUNDERGROUND_CITY);
-  wunderground.updateConditions(WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_CITY_CODE);
+  //wunderground.updateConditions(current_WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_COUNTRY, current_WUNDERGROUND_CITY);
+  wunderground.updateConditions(current_WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, current_WUNDERGROUND_CITY_CODE);
   drawProgress(70, "Updating forecasts...");
-  wunderground.updateForecast(WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_COUNTRY, WUNDERGROUND_CITY);
+  wunderground.updateForecast(current_WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_COUNTRY, current_WUNDERGROUND_CITY);
   drawProgress(90, "Updating astronomy...");
-  wunderground.updateAstronomy(WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_COUNTRY, WUNDERGROUND_CITY);
+  wunderground.updateAstronomy(current_WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_COUNTRY, current_WUNDERGROUND_CITY);
   //lastUpdate = timeClient.getFormattedTime();
   //readyForWeatherUpdate = false;
   drawProgress(100, "Done...");
