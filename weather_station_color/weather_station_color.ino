@@ -110,6 +110,10 @@ String getHTML() {
     String updatedIndexHTML = html_index;
     
     updatedIndexHTML.replace("[HTML_VALUE_API_KEY]", current_WUNDERGRROUND_API_KEY);
+
+    Serial.println("SERIAL API");
+    Serial.println(current_WUNDERGRROUND_API_KEY);
+    
     updatedIndexHTML.replace("[HTML_VALUE_CITY]", current_WUNDERGROUND_CITY);
     updatedIndexHTML.replace("[HTML_VALUE_CITY_CODE]", current_WUNDERGROUND_CITY_CODE);
 
@@ -147,7 +151,7 @@ void handleSettings() {
   else {
     current_IS_METRIC = false;
   }
-
+  updateData();
   // Return settings page with updated values
   handleRoot();
 }
