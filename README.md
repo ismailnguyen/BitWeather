@@ -14,6 +14,53 @@ The goal of this project is to allow a termometer accuracy. It is composed of a 
 - All in place <BR>
 [![All assemblate](http://i.imgur.com/ysy0L4u.jpg)](http://i.imgur.com/ysy0L4u.jpg)<BR>
 
+## Software Dependencies
+
+[Arduino IDE](https://www.arduino.cc/en/main/software)
+
+If you use windows / OSx you will probably need drivers: [Wemos Driver](https://www.wemos.cc/downloads)
+
+
+## Install
+
+### Clone project
+
+```sh
+git clone https://github.com/ismailnguyen/WeatherStation.git  
+```
+
+### Setup environment
+
+1. Start Arduino IDE
+
+#### Setup the board
+
+1. Open the Preferences window
+2. In the Additional Board Manager URLs field, enter: http://arduino.esp8266.com/versions/2.3.0/package_esp8266com_index.json
+3. Open `Tools` -> `Board` -> `Boards Manager...`
+4. Type `esp` and the `esp8266` platform will appear, install it
+5. Select your board: `Tools` -> `Board` -> `Wemos D1 R2 & mini`
+
+#### Add external libraries
+
+1. Open `Sketch` -> `Include Library` -> `Manage Libraries...`
+2. Install `WiFiManager`
+3. Install `Adafruit NeoPixel`
+4. Install `elapsedMillis`
+
+### Upload `WeatherStation` project to your Arduino
+
+1. Open the BitWeather project
+2. Open monitor: `Tools` -> `Serial Monitor`
+3. Maybe you will have to select the port: `Tools` -> `Port`
+
+### Set the network connection
+
+1. Upload the program, you should now see the access point `BitWeather` on your computer !
+2. Connect your computer to it
+3. Open your webbrowser
+4. Configure the network by the web interface (SSID + password)
+
 ## Steps followed
 We made the project by following these steps :
 
