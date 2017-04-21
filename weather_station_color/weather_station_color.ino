@@ -1,10 +1,10 @@
 #include <Arduino.h>
 #include <SPI.h>
-#include <Wire.h>     
+#include <Wire.h>
 #include "Adafruit_STMPE610.h"
 #include "GfxUi.h"
 #include <ArduinoOTA.h>
-#include <ESP8266WiFi.h>  
+#include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <Adafruit_GFX.h>           //Interface graphique
 #include <Adafruit_ILI9341.h>       //Hardware
@@ -19,10 +19,10 @@
 #include "settings.h"               //Parametrage
 #include <JsonListener.h>           //Librarie JSON
 #include <WundergroundClient.h>     //Librairie pour récupérer les prévisions
-#include "TimeClient.h" 
+#include "TimeClient.h"
 #include "html.h"                   //Page HTML
 
-#define DHTPIN    D3 
+#define DHTPIN    D3
 #define DHTTYPE   DHT11
 #define HOSTNAME  "ESP8266-OTA-"
 
@@ -60,47 +60,47 @@ String            getMeteoconIcon(String iconText);
 void              drawAstronomy();
 
 String getHTML() {
-    String updatedIndexHTML = html_index;
-    
-    updatedIndexHTML.replace("[HTML_VALUE_API_KEY]", current_WUNDERGRROUND_API_KEY);
+  String updatedIndexHTML = html_index;
 
-    Serial.println("SERIAL API");
-    Serial.println(current_WUNDERGRROUND_API_KEY);
-    
-    updatedIndexHTML.replace("[HTML_VALUE_CITY]", current_WUNDERGROUND_CITY);
-    updatedIndexHTML.replace("[HTML_VALUE_CITY_CODE]", current_WUNDERGROUND_CITY_CODE);
+  updatedIndexHTML.replace("[HTML_VALUE_API_KEY]", current_WUNDERGRROUND_API_KEY);
 
-    String current_UTC_OFFSET_string = static_cast<String>(static_cast<int>(current_UTC_OFFSET));
-    String current_UTC_OFFSET_HTML = "<option value='" + current_UTC_OFFSET_string + "'>" + current_UTC_OFFSET_string + "</option>";
-    String new_UTC_OFFSET_HTML = "<option value='" + current_UTC_OFFSET_string + "' selected>" + current_UTC_OFFSET_string + "</option>";
-      
-    updatedIndexHTML.replace(current_UTC_OFFSET_HTML, new_UTC_OFFSET_HTML);
+  Serial.println("SERIAL API");
+  Serial.println(current_WUNDERGRROUND_API_KEY);
 
-    String current_IS_METRIC_HTML = "";
-    String new_IS_METRIC_HTML = "";
-    if (current_IS_METRIC) {
-      current_IS_METRIC_HTML = "<option value='C'>&#8451;</option>";
-      new_IS_METRIC_HTML = "<option value='C' selected>&#8451;</option>";
-    } 
-    else {
-      current_IS_METRIC_HTML = "<option value='F'>&#8457;</option>";
-      new_IS_METRIC_HTML = "<option value='F' selected>&#8457;</option>";
-    }
-    updatedIndexHTML.replace(current_IS_METRIC_HTML, new_IS_METRIC_HTML);
-    
-    String current_ACTUAL_TEMP_HTML = "";
-    String new_ACTUAL_TEMP_HTML = "";
-    if (current_ACTUAL_TEMP) {
-      current_ACTUAL_TEMP_HTML = "<option value='Actual_temp'>Temp&eacute;rature locale</option>";
-      new_ACTUAL_TEMP_HTML = "<option value='Actual_temp' selected>Temp&eacute;rature locale</option>";
-    } 
-    else {
-      current_ACTUAL_TEMP_HTML = "<option value='Moon'>Phase lunaire</option>";
-      new_ACTUAL_TEMP_HTML = "<option value='Moon' selected>Phase lunaire</option>";
-    }
-    updatedIndexHTML.replace(current_ACTUAL_TEMP_HTML, new_ACTUAL_TEMP_HTML);
+  updatedIndexHTML.replace("[HTML_VALUE_CITY]", current_WUNDERGROUND_CITY);
+  updatedIndexHTML.replace("[HTML_VALUE_CITY_CODE]", current_WUNDERGROUND_CITY_CODE);
 
-    return updatedIndexHTML;
+  String current_UTC_OFFSET_string = static_cast<String>(static_cast<int>(current_UTC_OFFSET));
+  String current_UTC_OFFSET_HTML = "<option value='" + current_UTC_OFFSET_string + "'>" + current_UTC_OFFSET_string + "</option>";
+  String new_UTC_OFFSET_HTML = "<option value='" + current_UTC_OFFSET_string + "' selected>" + current_UTC_OFFSET_string + "</option>";
+
+  updatedIndexHTML.replace(current_UTC_OFFSET_HTML, new_UTC_OFFSET_HTML);
+
+  String current_IS_METRIC_HTML = "";
+  String new_IS_METRIC_HTML = "";
+  if (current_IS_METRIC) {
+    current_IS_METRIC_HTML = "<option value='C'>&#8451;</option>";
+    new_IS_METRIC_HTML = "<option value='C' selected>&#8451;</option>";
+  }
+  else {
+    current_IS_METRIC_HTML = "<option value='F'>&#8457;</option>";
+    new_IS_METRIC_HTML = "<option value='F' selected>&#8457;</option>";
+  }
+  updatedIndexHTML.replace(current_IS_METRIC_HTML, new_IS_METRIC_HTML);
+
+  String current_ACTUAL_TEMP_HTML = "";
+  String new_ACTUAL_TEMP_HTML = "";
+  if (current_ACTUAL_TEMP) {
+    current_ACTUAL_TEMP_HTML = "<option value='Actual_temp'>Temp&eacute;rature locale</option>";
+    new_ACTUAL_TEMP_HTML = "<option value='Actual_temp' selected>Temp&eacute;rature locale</option>";
+  }
+  else {
+    current_ACTUAL_TEMP_HTML = "<option value='Moon'>Phase lunaire</option>";
+    new_ACTUAL_TEMP_HTML = "<option value='Moon' selected>Phase lunaire</option>";
+  }
+  updatedIndexHTML.replace(current_ACTUAL_TEMP_HTML, new_ACTUAL_TEMP_HTML);
+
+  return updatedIndexHTML;
 }
 
 void handleSettings() {
@@ -109,7 +109,7 @@ void handleSettings() {
   current_WUNDERGROUND_CITY = server.arg("city");
   current_WUNDERGROUND_CITY_CODE = server.arg("city_code");
   current_UTC_OFFSET = server.arg("utc_offset").toFloat();
-  
+
   if (server.arg("temperature") == "C") {
     current_IS_METRIC = true;
   }
@@ -126,7 +126,7 @@ void handleSettings() {
 
   // Refresh screen display
   updateData();
-  
+
   // Return settings page with updated values
   handleRoot();
 }
@@ -141,7 +141,7 @@ void setupServer() {
 
   // Settings update endpoint
   server.on("/update", handleSettings);
-  
+
   // Start web server
   server.begin();
 
@@ -149,13 +149,13 @@ void setupServer() {
 }
 
 void setupMDNS() {
-    // Add service to MDNS-SD to access the ESP with the URL http://<ssid>.local
-    if (MDNS.begin(ssid)) {
-        Serial.print("MDNS responder started as http://");
-        Serial.print(ssid);
-        Serial.println(".local");
-    }
-    MDNS.addService("http", "tcp", 8080);
+  // Add service to MDNS-SD to access the ESP with the URL http://<ssid>.local
+  if (MDNS.begin(ssid)) {
+    Serial.print("MDNS responder started as http://");
+    Serial.print(ssid);
+    Serial.println(".local");
+  }
+  MDNS.addService("http", "tcp", 8080);
 }
 
 void setupWifi() {
@@ -178,13 +178,13 @@ void setup() {
   spitouch.writeRegister8(STMPE_GPIO_ALT_FUNCT, _BV(2));
   // backlight on
   spitouch.writeRegister8(STMPE_GPIO_SET_PIN, _BV(2));
-   
+
   tft.begin();
   tft.fillScreen(ILI9341_BLACK);
   tft.setFont(&ArialRoundedMTBold_14);
   ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
   ui.setTextAlignment(CENTER);
-  ui.drawString(120, 160, "Connecting to WiFi");
+  ui.drawString(120, 160, "Lancement du WiFi");
 
   setupWifi();
 
@@ -204,32 +204,32 @@ void setup() {
 
   setupServer();
   setupMDNS();
-  
+
   Serial.println("Setup OK.");
 }
 
 
 
 void loop() {
-    ArduinoOTA.handle();
-    
-    // On vérifie si il y a un appel client pour la page de paramètrage
-    server.handleClient();
+  ArduinoOTA.handle();
 
-    // Toutes les 30s
-    if (millis() - lastDrew > 30000) {
-      drawTime();
-      if (current_ACTUAL_TEMP) {
-        drawTemp();
-      }
-      lastDrew = millis();
-    }
+  // On vérifie si il y a un appel client pour la page de paramètrage
+  server.handleClient();
 
-    // Toutes les 10 mn (UPDATE_INTERVAL_SECS ==> 10 * 60 = 600)
-    if (millis() - lastDownloadUpdate > 1000 * UPDATE_INTERVAL_SECS) {
-      updateData();
-      lastDownloadUpdate = millis();
+  // Toutes les 30s
+  if (millis() - lastDrew > 30000) {
+    drawTime();
+    if (current_ACTUAL_TEMP) {
+      drawTemp();
     }
+    lastDrew = millis();
+  }
+
+  // Toutes les 10 mn (UPDATE_INTERVAL_SECS ==> 10 * 60 = 600)
+  if (millis() - lastDownloadUpdate > 1000 * UPDATE_INTERVAL_SECS) {
+    updateData();
+    lastDownloadUpdate = millis();
+  }
 }
 
 // Called if WiFi has not been configured yet
@@ -322,7 +322,7 @@ void drawTime() {
   tft.setFont(&ArialRoundedMTBold_14);
   String date = wunderground.getDate();
   ui.drawString(120, 20, date);
-  
+
   tft.setFont(&ArialRoundedMTBold_36);
   String time = timeClient.getHours() + ":" + timeClient.getMinutes();
   ui.drawString(120, 56, time);
@@ -333,7 +333,7 @@ void drawCurrentWeather() {
   // Weather Icon
   String weatherIcon = getMeteoconIcon(wunderground.getTodayIcon());
   ui.drawBmp(weatherIcon + ".bmp", 0, 55);
-  
+
   // Weather Text
   tft.setFont(&ArialRoundedMTBold_14);
   ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
@@ -370,19 +370,19 @@ void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex) {
 
   ui.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
   ui.drawString(x + 25, y + 14, wunderground.getForecastLowTemp(dayIndex) + "|" + wunderground.getForecastHighTemp(dayIndex));
-  
+
   String weatherIcon = getMeteoconIcon(wunderground.getForecastIcon(dayIndex));
   ui.drawBmp("/mini/" + weatherIcon + ".bmp", x, y + 15);
-    
+
 }
 
 // draw moonphase and sunrise/set and moonrise/set
 void drawAstronomy() {
   int moonAgeImage = 24 * wunderground.getMoonAge().toInt() / 30.0;
   ui.drawBmp("/moon" + String(moonAgeImage) + ".bmp", 120 - 30, 255);
-  
+
   ui.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-  tft.setFont(&ArialRoundedMTBold_14);  
+  tft.setFont(&ArialRoundedMTBold_14);
   ui.setTextAlignment(LEFT);
   ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
   ui.drawString(20, 270, SUN);
@@ -396,14 +396,14 @@ void drawAstronomy() {
   ui.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
   ui.drawString(220, 285, wunderground.getMoonriseTime());
   ui.drawString(220, 300, wunderground.getMoonsetTime());
-  
+
 }
 
 // draw moonphase and sunrise/set and moonrise/set
 void drawTemp() {
-  
+
   ui.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
-  tft.setFont(&ArialRoundedMTBold_14);  
+  tft.setFont(&ArialRoundedMTBold_14);
   ui.setTextAlignment(LEFT);
   ui.setTextColor(ILI9341_WHITE, ILI9341_BLACK);
   ui.drawString(20, 270, "Temp.");
@@ -414,7 +414,7 @@ void drawTemp() {
   float h = dht.readHumidity();
   float t = dht.readTemperature();
 
-  
+
   Serial.println("TEMP");
   Serial.println(t);
   Serial.println("HUMI");
@@ -427,13 +427,13 @@ void drawTemp() {
     result_t.replace("0", static_cast<String>(static_cast<int>(t)));
     result_h.replace("0", static_cast<String>(static_cast<int>(h)));
   }
-  
+
   ui.setTextAlignment(LEFT);
-  tft.setFont(&ArialRoundedMTBold_36);  
+  tft.setFont(&ArialRoundedMTBold_36);
   ui.drawString(20, 300, result_t);
   ui.setTextAlignment(RIGHT);
   ui.drawString(220, 300, result_h);
-  
+
 }
 
 
@@ -453,27 +453,27 @@ String getMeteoconIcon(String iconText) {
   if (iconText == "V") return "chancesnow";
   if (iconText == "W") return "snow";
   if (iconText == "Y") return "cloudy";
-  
+
   /*if (iconText == "0") return "tstorms";
-  if (iconText == "B") return "clear";
-  if (iconText == "B") return "sunny";
-  if (iconText == "E") return "hazy";
-  if (iconText == "F") return "flurries";
-  if (iconText == "F") return "chanceflurries";
-  if (iconText == "H") return "mostlysunny";
-  if (iconText == "H") return "partlycloudy";
-  if (iconText == "J") return "partlysunny";
-  if (iconText == "M") return "fog";
-  if (iconText == "Q") return "chancerain";
-  if (iconText == "R") return "rain";
-  if (iconText == "S") return "chancetstorms";
-  if (iconText == "V") return "chancesnow";
-  if (iconText == "W") return "chancesleet";
-  if (iconText == "W") return "sleet";
-  if (iconText == "W") return "snow";
-  if (iconText == "Y") return "cloudy";
-  if (iconText == "Y") return "mostlycloudy";*/
-  
+    if (iconText == "B") return "clear";
+    if (iconText == "B") return "sunny";
+    if (iconText == "E") return "hazy";
+    if (iconText == "F") return "flurries";
+    if (iconText == "F") return "chanceflurries";
+    if (iconText == "H") return "mostlysunny";
+    if (iconText == "H") return "partlycloudy";
+    if (iconText == "J") return "partlysunny";
+    if (iconText == "M") return "fog";
+    if (iconText == "Q") return "chancerain";
+    if (iconText == "R") return "rain";
+    if (iconText == "S") return "chancetstorms";
+    if (iconText == "V") return "chancesnow";
+    if (iconText == "W") return "chancesleet";
+    if (iconText == "W") return "sleet";
+    if (iconText == "W") return "snow";
+    if (iconText == "Y") return "cloudy";
+    if (iconText == "Y") return "mostlycloudy";*/
+
   return "unknown";
 }
 
