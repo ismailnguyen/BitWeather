@@ -45,12 +45,11 @@ git clone https://github.com/ismailnguyen/WeatherStation.git
 
 1. Open `Sketch` -> `Include Library` -> `Manage Libraries...`
 2. Install `WiFiManager`
-3. Install `Adafruit NeoPixel`
-4. Install `elapsedMillis`
-5. Install `Weather Station Library`
-6. Install `Adafruit ILI9341`
-7. Install `Adafruit GFX`
-8. Install `WifiManager`
+3. Install `Weather Station Library`
+4. Install `Adafruit ILI9341`
+5. Install `Adafruit GFX`
+6. Install `Adafruit Unified Sensor`
+7. Install `DHT sensor library`
 
 ### Upload `WeatherStation` project to your Arduino
 
