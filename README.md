@@ -138,3 +138,11 @@ D3  | D4
 - [Arduino core for ESP8266](https://github.com/esp8266/Arduino)
 - [Font for arduino screen](http://oleddisplay.squix.ch)
 - [Wifi Manager](https://github.com/tzapu/WiFiManager)
+
+
+## Project planning
+### Gantt
+[![Gantt](http://i.imgur.com/VAtGOoD.png)](http://i.imgur.com/VAtGOoD.png)
+
+### Tasks
+[![MVP steps](http://i.imgur.com/aEby3q5.png)](http://i.imgur.com/aEby3q5.png)
