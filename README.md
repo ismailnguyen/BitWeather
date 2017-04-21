@@ -90,6 +90,7 @@ git clone https://github.com/ismailnguyen/WeatherStation.git
 1. Open your webbrowser from the same network as your WeatherStation
 2. Go where WeatherStation's web server is hosted (`BitWeather.local`)
 3. Update your preferences and save ! (WeatherStation should reload with updated values)
+The API Key corresponds to your [Wunderground API key (it's free)](https://www.wunderground.com/member/registration/)
 
 
 [![Settings screen](http://i.imgur.com/KKq17dF.png)](http://i.imgur.com/KKq17dF.png)
