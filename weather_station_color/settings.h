@@ -32,10 +32,6 @@ boolean ACTUAL_TEMP = true;
 #define TFT_DC 2
 #define TFT_CS 4
 
-// pins for the touchscreen
-#define STMPE_CS 0
-#define STMPE_IRQ 5
-
 // TimeClient settings
 const float UTC_OFFSET = 2;
 
@@ -46,10 +42,6 @@ const String WUNDERGRROUND_LANGUAGE = "FR";
 const String WUNDERGROUND_COUNTRY = "FR";
 const String WUNDERGROUND_CITY = "SEUGY";
 const String WUNDERGROUND_CITY_CODE = "00000.91.07157";
-
-//Thingspeak Settings
-const String THINGSPEAK_CHANNEL_ID = "67284";
-const String THINGSPEAK_API_READ_KEY = "L2VIW20QVNZJBLAK";
 
 // List, so that the downloader knows what to fetch
 String wundergroundIcons [] = {"chanceflurries","chancerain","chancesleet","chancesnow","clear","cloudy","flurries","fog","hazy","mostlycloudy","mostlysunny","partlycloudy","partlysunny","rain","sleet","snow","sunny","tstorms","unknown"};

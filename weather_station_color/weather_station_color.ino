@@ -35,7 +35,6 @@ boolean             current_IS_METRIC = IS_METRIC;
 boolean             current_ACTUAL_TEMP = ACTUAL_TEMP;
 Adafruit_ILI9341    tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 GfxUi               ui = GfxUi(&tft);
-Adafruit_STMPE610   spitouch = Adafruit_STMPE610(STMPE_CS);
 WebResource         webResource;
 TimeClient          timeClient(UTC_OFFSET);
 WundergroundClient  wunderground(current_IS_METRIC);
@@ -116,6 +115,7 @@ void handleSettings() {
   else {
     current_IS_METRIC = false;
   }
+  wunderground.initMetric(current_IS_METRIC);
 
   if (server.arg("info_supp") == "Actual_temp") {
     current_ACTUAL_TEMP = true;
@@ -169,22 +169,13 @@ void setupWifi() {
 void setup() {
   Serial.begin(115200);
   dht.begin();
-  if (! spitouch.begin()) {
-    Serial.println("STMPE not found?");
-  }
-
-  // we'll use STMPE's GPIO 2 for backlight control
-  spitouch.writeRegister8(STMPE_GPIO_DIR, _BV(2));
-  spitouch.writeRegister8(STMPE_GPIO_ALT_FUNCT, _BV(2));
-  // backlight on
-  spitouch.writeRegister8(STMPE_GPIO_SET_PIN, _BV(2));
-
+  
   tft.begin();
   tft.fillScreen(ILI9341_BLACK);
   tft.setFont(&ArialRoundedMTBold_14);
   ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
   ui.setTextAlignment(CENTER);
-  ui.drawString(120, 160, "Lancement du WiFi");
+  ui.drawString(120, 160, "On se connecte");
 
   setupWifi();
 
@@ -192,8 +183,8 @@ void setup() {
   String hostname(HOSTNAME);
   hostname += String(ESP.getChipId(), HEX);
   WiFi.hostname(hostname);
-  ArduinoOTA.setHostname((const char *)hostname.c_str());
-  ArduinoOTA.begin();
+  //ArduinoOTA.setHostname((const char *)hostname.c_str());
+  //ArduinoOTA.begin();
   SPIFFS.begin();
 
   //On recupère les images
@@ -211,7 +202,7 @@ void setup() {
 
 
 void loop() {
-  ArduinoOTA.handle();
+  //ArduinoOTA.handle();
 
   // On vérifie si il y a un appel client pour la page de paramètrage
   server.handleClient();
@@ -286,16 +277,16 @@ void downloadResources() {
 void updateData() {
   tft.fillScreen(ILI9341_BLACK);
   tft.setFont(&ArialRoundedMTBold_14);
-  drawProgress(20, "Updating time...");
+  drawProgress(20, "Il est quelle heure ?");
   timeClient.updateTime();
-  drawProgress(50, "MAJ du temps...");
+  drawProgress(50, "Il fait beau ? ");
   //wunderground.updateConditions(current_WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_COUNTRY, current_WUNDERGROUND_CITY); ancienne méthode, on utilise le code propre a la ville maintenant
   wunderground.updateConditions(current_WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, current_WUNDERGROUND_CITY_CODE);
-  drawProgress(70, "MAJ Previsions...");
+  drawProgress(70, "Va-t-il pleuvoir ?");
   wunderground.updateForecast(current_WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_COUNTRY, current_WUNDERGROUND_CITY);
-  drawProgress(90, "MAJ des astres...");
+  drawProgress(90, "La tete dans la lune...");
   wunderground.updateAstronomy(current_WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_COUNTRY, current_WUNDERGROUND_CITY);
-  drawProgress(100, "J ai enfin fini...");
+  drawProgress(100, "Allez je te dit tout...");
   delay(1000);
   tft.fillScreen(ILI9341_BLACK);
   drawTime();
@@ -338,7 +329,12 @@ void drawCurrentWeather() {
   tft.setFont(&ArialRoundedMTBold_14);
   ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
   ui.setTextAlignment(RIGHT);
-  ui.drawString(220, 90, wunderground.getWeatherText());
+  String tmp = wunderground.getWeatherText();
+  tmp.replace("é", "e");
+  tmp.replace("è", "e");
+  tmp.replace("ê", "e");
+  tmp.replace("à", "a");
+  ui.drawString(220, 90, tmp);
 
   tft.setFont(&ArialRoundedMTBold_36);
   ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
