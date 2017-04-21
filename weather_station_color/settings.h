@@ -37,7 +37,7 @@ const float UTC_OFFSET = 2;
 
 // Wunderground Settings
 const boolean IS_METRIC = true;
-const String WUNDERGRROUND_API_KEY = "597068b00486e812";
+const String WUNDERGRROUND_API_KEY = "XXXXXXXXXXXXXXX";
 const String WUNDERGRROUND_LANGUAGE = "FR";
 const String WUNDERGROUND_COUNTRY = "FR";
 const String WUNDERGROUND_CITY = "SEUGY";
