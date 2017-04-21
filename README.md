@@ -20,6 +20,7 @@ The goal of this project is to allow a termometer accuracy. It is composed of a 
         - [Set the network connection](#set-the-network-connection)
         - [Set `WeatherStation`](#set-weatherstation)
     - [Steps followed](#steps-followed)
+    - [Sketch](#sketch)
     - [Wiring - Pin's Correspondence (Arduino / Screen)](#wiring---pins-correspondence-arduino--screen)
     - [Sources](#sources)
 
@@ -32,8 +33,14 @@ The goal of this project is to allow a termometer accuracy. It is composed of a 
 [![Screen - Face](http://i.imgur.com/AzSjkEK.jpg)](http://i.imgur.com/AzSjkEK.jpg)
 [![Screen - Back](http://i.imgur.com/h1CRPeX.jpg)](http://i.imgur.com/h1CRPeX.jpg)<BR>
 
-- All in place
+- DHT Humidity & Temperature Unified Sensor<BR>
+[![DHT sensor](http://i.imgur.com/hwdQ30U.png)](http://i.imgur.com/hwdQ30U.png)
+
+- All in place<BR>
 [![All assemblate](http://i.imgur.com/ysy0L4u.jpg)](http://i.imgur.com/ysy0L4u.jpg)<BR>
+
+- In the box<BR>
+[![Assembled product](http://i.imgur.com/DLzYr5T.jpg)](http://i.imgur.com/DLzYr5T.jpg)
 
 ## Software requirements
 
@@ -105,6 +112,11 @@ We made the project by following these steps :
       - IHM
         - screen on weemos
 
+## Sketch
+
+[![Sketch](http://i.imgur.com/LSkxa9y.png)](http://i.imgur.com/LSkxa9y.png)
+
+[![Sketch](http://i.imgur.com/eUit68K.png)](http://i.imgur.com/eUit68K.png)
 
 ## Wiring - Pin's Correspondence (ARDUINO / Screen)
 
