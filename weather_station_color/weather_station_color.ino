@@ -32,6 +32,7 @@ String              current_WUNDERGROUND_CITY = WUNDERGROUND_CITY;
 String              current_WUNDERGROUND_CITY_CODE = WUNDERGROUND_CITY_CODE;
 float               current_UTC_OFFSET = UTC_OFFSET;
 boolean             current_IS_METRIC = IS_METRIC;
+boolean             current_ACTUAL_TEMP = ACTUAL_TEMP;
 Adafruit_ILI9341    tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 GfxUi               ui = GfxUi(&tft);
 Adafruit_STMPE610   spitouch = Adafruit_STMPE610(STMPE_CS);
@@ -86,6 +87,18 @@ String getHTML() {
       new_IS_METRIC_HTML = "<option value='F' selected>&#8457;</option>";
     }
     updatedIndexHTML.replace(current_IS_METRIC_HTML, new_IS_METRIC_HTML);
+    
+    String current_ACTUAL_TEMP_HTML = "";
+    String new_ACTUAL_TEMP_HTML = "";
+    if (current_ACTUAL_TEMP) {
+      current_ACTUAL_TEMP_HTML = "<option value='Actual_temp'>Temp&eacute;rature locale</option>";
+      new_ACTUAL_TEMP_HTML = "<option value='Actual_temp' selected>Temp&eacute;rature locale</option>";
+    } 
+    else {
+      current_ACTUAL_TEMP_HTML = "<option value='Moon'>Phase lunaire</option>";
+      new_ACTUAL_TEMP_HTML = "<option value='Moon' selected>Phase lunaire</option>";
+    }
+    updatedIndexHTML.replace(current_ACTUAL_TEMP_HTML, new_ACTUAL_TEMP_HTML);
 
     return updatedIndexHTML;
 }
@@ -103,7 +116,17 @@ void handleSettings() {
   else {
     current_IS_METRIC = false;
   }
+
+  if (server.arg("info_supp") == "Actual_temp") {
+    current_ACTUAL_TEMP = true;
+  }
+  else {
+    current_ACTUAL_TEMP = false;
+  }
+
+  // Refresh screen display
   updateData();
+  
   // Return settings page with updated values
   handleRoot();
 }
@@ -196,7 +219,7 @@ void loop() {
     // Toutes les 30s
     if (millis() - lastDrew > 30000) {
       drawTime();
-      if (ACTUAL_TEMP) {
+      if (current_ACTUAL_TEMP) {
         drawTemp();
       }
       lastDrew = millis();
@@ -278,7 +301,7 @@ void updateData() {
   drawTime();
   drawCurrentWeather();
   drawForecast();
-  if (!ACTUAL_TEMP) {
+  if (!current_ACTUAL_TEMP) {
     drawAstronomy();
   }
 }
