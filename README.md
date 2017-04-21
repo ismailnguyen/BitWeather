@@ -1,8 +1,29 @@
 # WeatherStation
+
+## Introduction
 Weather station using Arduino
 The goal of this project is to allow a termometer accuracy. It is composed of a screen, a wemos D1 and a web interface to check for the accuracy and set the BPM.<BR>
 
-## Hardware requirements <BR>
+## Summary
+
+- [WeatherStation](#weatherstation)
+    - [Introduction](#introduction)
+    - [Summary](#summary)
+    - [Hardware requirements](#hardware-requirements)
+    - [Software requirements](#software-requirements)
+    - [Install](#install)
+        - [Clone project](#clone-project)
+        - [Setup environment](#setup-environment)
+            - [Setup the board](#setup-the-board)
+            - [Add external libraries](#add-external-libraries)
+        - [Upload source to Arduino](#upload-source-to-arduino)
+        - [Set the network connection](#set-the-network-connection)
+        - [Set `WeatherStation`](#set-weatherstation)
+    - [Steps followed](#steps-followed)
+    - [Wiring - Pin's Correspondence (Arduino / Screen)](#wiring---pins-correspondence-arduino--screen)
+    - [Sources](#sources)
+
+## Hardware requirements
 - Weemos D1 (ESP8266, Arduino-compatible layout, wifi, 80/160Mhz, 4Mb flash)<BR>
 [![Weemos D1 - Face](http://i.imgur.com/Wp4gmGz.jpg)](http://i.imgur.com/Wp4gmGz.jpg)
 [![Weemos D1 - Back](http://i.imgur.com/7sasqUQ.jpg)](http://i.imgur.com/7sasqUQ.jpg)<BR>
@@ -11,7 +32,7 @@ The goal of this project is to allow a termometer accuracy. It is composed of a 
 [![Screen - Face](http://i.imgur.com/AzSjkEK.jpg)](http://i.imgur.com/AzSjkEK.jpg)
 [![Screen - Back](http://i.imgur.com/h1CRPeX.jpg)](http://i.imgur.com/h1CRPeX.jpg)<BR>
 
-- All in place <BR>
+- All in place
 [![All assemblate](http://i.imgur.com/ysy0L4u.jpg)](http://i.imgur.com/ysy0L4u.jpg)<BR>
 
 ## Software requirements
@@ -51,7 +72,7 @@ git clone https://github.com/ismailnguyen/WeatherStation.git
 6. Install `Adafruit Unified Sensor`
 7. Install `DHT sensor library`
 
-### Upload `WeatherStation` project to your Arduino
+### Upload source to Arduino
 
 1. Open the BitWeather project
 2. Open monitor: `Tools` -> `Serial Monitor`
@@ -64,7 +85,7 @@ git clone https://github.com/ismailnguyen/WeatherStation.git
 3. Open your webbrowser
 4. Configure the network by the web interface (SSID + password)
 
-### Set your WeatherStation
+### Set WeatherStation
 
 1. Open your webbrowser from the same network as your WeatherStation
 2. Go where WeatherStation's web server is hosted (`BitWeather.local`)
