@@ -84,3 +84,10 @@ D4 | D/C
 D7 | SDI (MOSI)
 D5 | SCK
 3V3 | LED
+
+
+
+## Sources
+https://github.com/esp8266/Arduino 
+http://oleddisplay.squix.ch/
+https://github.com/tzapu/WiFiManager
