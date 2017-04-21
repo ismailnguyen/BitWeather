@@ -2,7 +2,7 @@
 Weather station using Arduino
 The goal of this project is to allow a termometer accuracy. It is composed of a screen, a wemos D1 and a web interface to check for the accuracy and set the BPM.<BR>
 
-## Needed hardware <BR>
+## Hardware requirements <BR>
 - Weemos D1 (ESP8266, Arduino-compatible layout, wifi, 80/160Mhz, 4Mb flash)<BR>
 [![Weemos D1 - Face](http://i.imgur.com/Wp4gmGz.jpg)](http://i.imgur.com/Wp4gmGz.jpg)
 [![Weemos D1 - Back](http://i.imgur.com/7sasqUQ.jpg)](http://i.imgur.com/7sasqUQ.jpg)<BR>
@@ -14,9 +14,9 @@ The goal of this project is to allow a termometer accuracy. It is composed of a 
 - All in place <BR>
 [![All assemblate](http://i.imgur.com/ysy0L4u.jpg)](http://i.imgur.com/ysy0L4u.jpg)<BR>
 
-## Software Dependencies
+## Software requirements
 
-[Arduino IDE](https://www.arduino.cc/en/main/software)
+[Arduino IDE with ESP8266 platform installed](https://www.arduino.cc/en/main/software)
 
 If you use windows / OSx you will probably need drivers: [Wemos Driver](https://www.wemos.cc/downloads)
 
@@ -76,7 +76,9 @@ We made the project by following these steps :
         - screen on weemos
 
 
-## Pin's Correspondence (ARDUINO / Screen)
+## Wiring - Pin's Correspondence (ARDUINO / Screen)
+
+See code for pin configurations
 
 Weemos D1 Mini | ILI9341 Screen
 --- | --- 
