@@ -1,110 +1,62 @@
-/**The MIT License (MIT)
-Copyright (c) 2015 by Daniel Eichhorn
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-See more at http://blog.squix.ch
-*/
-
 #include <Arduino.h>
-
-#include <Adafruit_GFX.h>    // Core graphics library
-#include <Adafruit_ILI9341.h> // Hardware-specific library
 #include <SPI.h>
-#include <Wire.h>  // required even though we do not use I2C 
+#include <Wire.h>     
 #include "Adafruit_STMPE610.h"
-
-// Additional UI functions
 #include "GfxUi.h"
-
-// Fonts created by http://oleddisplay.squix.ch/
-#include "ArialRoundedMTBold_14.h"
-#include "ArialRoundedMTBold_36.h"
-
-// Download helper
-#include "WebResource.h"
-
 #include <ArduinoOTA.h>
-#include <ESP8266WiFi.h>          //https://github.com/esp8266/Arduino
+#include <ESP8266WiFi.h>  
 #include <WiFiClient.h>
-#include <DNSServer.h>            //Local DNS Server used for redirecting all requests to the &onfiguration portal
-#include <ESP8266WebServer.h>     //Local WebServer used to serve the configuration portal
-#include <WiFiManager.h>          //https://github.com/tzapu/WiFiManager WiFi Configuration Magic
-#include <ESP8266mDNS.h>          //Allow custom URL
+#include <Adafruit_GFX.h>           //Interface graphique
+#include <Adafruit_ILI9341.h>       //Hardware
+#include "ArialRoundedMTBold_14.h"  //Font size 14 by http://oleddisplay.squix.ch/
+#include "ArialRoundedMTBold_36.h"  //Font size 36 by http://oleddisplay.squix.ch/
+#include "WebResource.h"            //For Download
+#include <DNSServer.h>              //Local DNS Server used for redirecting all requests to the &onfiguration portal
+#include <ESP8266WebServer.h>       //Local WebServer used to serve the configuration portal
+#include <WiFiManager.h>            //https://github.com/tzapu/WiFiManager WiFi Configuration Magic
+#include <ESP8266mDNS.h>            //Url personnalisée BitWeather.local
+#include "DHT.h"                    //Temp & Humidity Driver
+#include "settings.h"               //Parametrage
+#include <JsonListener.h>           //Librarie JSON
+#include <WundergroundClient.h>     //Librairie pour récupérer les prévisions
+#include "TimeClient.h" 
+#include "html.h"                   //Page HTML
 
-#include "DHT.h"
+#define DHTPIN    D3 
+#define DHTTYPE   DHT11
+#define HOSTNAME  "ESP8266-OTA-"
 
-#define DHTPIN D3 
-#define DHTTYPE DHT11   // DHT 11
-// Application settings
-#include "settings.h"
+// Initialisation des variables
+String              current_WUNDERGRROUND_API_KEY = WUNDERGRROUND_API_KEY;
+String              current_WUNDERGROUND_CITY = WUNDERGROUND_CITY;
+String              current_WUNDERGROUND_CITY_CODE = WUNDERGROUND_CITY_CODE;
+float               current_UTC_OFFSET = UTC_OFFSET;
+boolean             current_IS_METRIC = IS_METRIC;
+Adafruit_ILI9341    tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+GfxUi               ui = GfxUi(&tft);
+Adafruit_STMPE610   spitouch = Adafruit_STMPE610(STMPE_CS);
+WebResource         webResource;
+TimeClient          timeClient(UTC_OFFSET);
+WundergroundClient  wunderground(current_IS_METRIC);
+long                lastDownloadUpdate = millis();
+DHT                 dht(DHTPIN, DHTTYPE);
+WiFiManager         wifiManager;
+ESP8266WebServer    server(80);
+long                lastDrew = 0;
 
-#include <JsonListener.h>
-#include <WundergroundClient.h>
-#include "TimeClient.h"
-
-// Include home html page
-#include "html.h"
-
-// HOSTNAME for OTA update
-#define HOSTNAME "ESP8266-OTA-"
-
-// Initialisation of default settings from HTML setting screen
-String current_WUNDERGRROUND_API_KEY = WUNDERGRROUND_API_KEY;
-String current_WUNDERGROUND_CITY = WUNDERGROUND_CITY;
-String current_WUNDERGROUND_CITY_CODE = WUNDERGROUND_CITY_CODE;
-float current_UTC_OFFSET = UTC_OFFSET;
-boolean current_IS_METRIC = IS_METRIC;
-
-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
-GfxUi ui = GfxUi(&tft);
-
-Adafruit_STMPE610 spitouch = Adafruit_STMPE610(STMPE_CS);
-
-WebResource webResource;
-TimeClient timeClient(UTC_OFFSET);
-
-// Set to false, if you prefere imperial/inches, Fahrenheit
-WundergroundClient wunderground(current_IS_METRIC);
-
-//declaring prototypes
-void configModeCallback (WiFiManager *myWiFiManager);
-void downloadCallback(String filename, int16_t bytesDownloaded, int16_t bytesTotal);
-ProgressCallback _downloadCallback = downloadCallback;
-void downloadResources();
-void updateData();
-void drawProgress(uint8_t percentage, String text);
-void drawTime();
-void drawCurrentWeather();
-void drawForecast();
-void drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex);
-String getMeteoconIcon(String iconText);
-void drawAstronomy();
-void drawSeparator(uint16_t y);
-void sleepNow(int wakeup);
-
-long lastDownloadUpdate = millis();
-
-DHT dht(DHTPIN, DHTTYPE);
-//WiFiManager
-//Local intialization. Once its business is done, there is no need to keep it around
-WiFiManager wifiManager;
-
-// Web server
-// Initialization with custom SSID
-ESP8266WebServer server(80);
+//Déclaration des fonctions
+void              configModeCallback (WiFiManager *myWiFiManager);
+void              downloadCallback(String filename, int16_t bytesDownloaded, int16_t bytesTotal);
+ProgressCallback  _downloadCallback = downloadCallback;
+void              downloadResources();
+void              updateData();
+void              drawProgress(uint8_t percentage, String text);
+void              drawTime();
+void              drawCurrentWeather();
+void              drawForecast();
+void              drawForecastDetail(uint16_t x, uint16_t y, uint8_t dayIndex);
+String            getMeteoconIcon(String iconText);
+void              drawAstronomy();
 
 String getHTML() {
     String updatedIndexHTML = html_index;
@@ -156,9 +108,6 @@ void handleSettings() {
   handleRoot();
 }
 
-/*
- * Set start page of web server
- */
 void handleRoot() {
   server.send(200, "text/html", getHTML());
 }
@@ -187,24 +136,9 @@ void setupMDNS() {
 }
 
 void setupWifi() {
-  //Manual Wifi
-  //WiFi.begin(WIFI_SSID, WIFI_PWD);
-  
-  //WiFiManager
   WiFiManager wifiManager;
-
-  //reset saved settings -- Flush flash
-  //wifiManager.resetSettings();
-
-  //set callback that gets called when connecting to previous WiFi fails, and enters Access Point mode
   wifiManager.setAPCallback(configModeCallback);
-
-  //fetches ssid and pass from eeprom and tries to connect
-  //if it does not connect it starts an access point with the specified name
-  //and goes into a blocking loop awaiting configuration
   wifiManager.autoConnect(ssid);
-
-  // might seem redundant but it's not printed the 1st time:
   Serial.println("local ip");
   Serial.println(WiFi.localIP());
 }
@@ -216,14 +150,6 @@ void setup() {
     Serial.println("STMPE not found?");
   }
 
-  // if using deep sleep, we can use the STMPE's IRQ pin to wake us up
-  if (DEEP_SLEEP) {
-    // this pin (#2) is connected to the STMPE IRQ pin
-    pinMode(STMPE_IRQ, INPUT_PULLUP); 
-    // tell the STMPE to use 'low' level as 'touched' indicator
-    spitouch.writeRegister8(STMPE_INT_CTRL, STMPE_INT_CTRL_POL_LOW | STMPE_INT_CTRL_ENABLE);
-  }
-  
   // we'll use STMPE's GPIO 2 for backlight control
   spitouch.writeRegister8(STMPE_GPIO_DIR, _BV(2));
   spitouch.writeRegister8(STMPE_GPIO_ALT_FUNCT, _BV(2));
@@ -247,13 +173,10 @@ void setup() {
   ArduinoOTA.begin();
   SPIFFS.begin();
 
-  //Uncomment if you want to update all internet resources
-  //SPIFFS.format();
-
-  // download images from the net. If images already exist don't download
+  //On recupère les images
   downloadResources();
 
-  // load the weather information
+  //On met a jour les données
   updateData();
 
   setupServer();
@@ -262,61 +185,15 @@ void setup() {
   Serial.println("Setup OK.");
 }
 
-long lastDrew = 0;
 
 
 void loop() {
-  
-  if (USE_TOUCHSCREEN_WAKE) {     // determine in settings.h
-    
-    // for AWAKE_TIME seconds we'll hang out and wait for OTA updates
-    for (uint16_t i=0; i<AWAKE_TIME; i++  ) {
-      // Handle OTA update requests
-      ArduinoOTA.handle();
-
-      // Handle web client requests
-      server.handleClient();
-      
-      delay(10000);
-      yield();
-    }
-
-    // turn off the display and wait for a touch!
-    // flush the touch buffer
-    while (spitouch.bufferSize() != 0) {
-      spitouch.getPoint();
-      //Serial.print('.');
-      yield();
-    }
-    
-    Serial.println("Zzzz");
-    spitouch.writeRegister8(STMPE_GPIO_CLR_PIN, _BV(2)); // backlight off  
-    spitouch.writeRegister8(STMPE_INT_STA, 0xFF);
-
-    if (DEEP_SLEEP) {
-      sleepNow(STMPE_IRQ);
-    } else {
-      while (! spitouch.touched()) {
-        // twiddle thumbs
-        delay(10);
-      }
-    }
-    Serial.println("Touch detected!");
-  
-    // wipe screen & backlight on
-    tft.fillScreen(ILI9341_BLACK);
-    spitouch.writeRegister8(STMPE_GPIO_SET_PIN, _BV(2));
-    updateData();
-  } 
-  else // "standard setup"
-  {
-    // Handle OTA update requests
     ArduinoOTA.handle();
+    
+    // On vérifie si il y a un appel client pour la page de paramètrage
+    server.handleClient();
 
-    // Handle web client requests
-      server.handleClient();
-
-    // Check if we should update the clock
+    // Toutes les 30s
     if (millis() - lastDrew > 30000) {
       drawTime();
       if (ACTUAL_TEMP) {
@@ -325,13 +202,11 @@ void loop() {
       lastDrew = millis();
     }
 
-    // Check if we should update weather information
+    // Toutes les 10 mn (UPDATE_INTERVAL_SECS ==> 10 * 60 = 600)
     if (millis() - lastDownloadUpdate > 1000 * UPDATE_INTERVAL_SECS) {
       updateData();
       lastDownloadUpdate = millis();
     }
-  }
-  
 }
 
 // Called if WiFi has not been configured yet
@@ -340,11 +215,11 @@ void configModeCallback (WiFiManager *myWiFiManager) {
   tft.setFont(&ArialRoundedMTBold_14);
   tft.setTextColor(ILI9341_CYAN);
   ui.drawString(120, 28, "Wifi Manager");
-  ui.drawString(120, 42, "Please connect to AP");
+  ui.drawString(120, 42, "Connectez vous sur ce point d acces");
   tft.setTextColor(ILI9341_WHITE);
   ui.drawString(120, 56, myWiFiManager->getConfigPortalSSID());
   tft.setTextColor(ILI9341_CYAN);
-  ui.drawString(120, 70, "To setup Wifi Configuration");
+  ui.drawString(120, 70, "Pour configurer le wifi");
 }
 
 // callback called during download of files. Updates progress bar
@@ -358,7 +233,6 @@ void downloadCallback(String filename, int16_t bytesDownloaded, int16_t bytesTot
   if (percentage % 5 == 0) {
     ui.setTextAlignment(CENTER);
     ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
-    //ui.drawString(120, 160, String(percentage) + "%");
     ui.drawProgressBar(10, 165, 240 - 20, 15, percentage, ILI9341_WHITE, ILI9341_BLUE);
   }
 
@@ -391,16 +265,14 @@ void updateData() {
   tft.setFont(&ArialRoundedMTBold_14);
   drawProgress(20, "Updating time...");
   timeClient.updateTime();
-  drawProgress(50, "Updating conditions...");
-  //wunderground.updateConditions(current_WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_COUNTRY, current_WUNDERGROUND_CITY);
+  drawProgress(50, "MAJ du temps...");
+  //wunderground.updateConditions(current_WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_COUNTRY, current_WUNDERGROUND_CITY); ancienne méthode, on utilise le code propre a la ville maintenant
   wunderground.updateConditions(current_WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, current_WUNDERGROUND_CITY_CODE);
-  drawProgress(70, "Updating forecasts...");
+  drawProgress(70, "MAJ Previsions...");
   wunderground.updateForecast(current_WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_COUNTRY, current_WUNDERGROUND_CITY);
-  drawProgress(90, "Updating astronomy...");
+  drawProgress(90, "MAJ des astres...");
   wunderground.updateAstronomy(current_WUNDERGRROUND_API_KEY, WUNDERGRROUND_LANGUAGE, WUNDERGROUND_COUNTRY, current_WUNDERGROUND_CITY);
-  //lastUpdate = timeClient.getFormattedTime();
-  //readyForWeatherUpdate = false;
-  drawProgress(100, "Done...");
+  drawProgress(100, "J ai enfin fini...");
   delay(1000);
   tft.fillScreen(ILI9341_BLACK);
   drawTime();
@@ -431,7 +303,6 @@ void drawTime() {
   tft.setFont(&ArialRoundedMTBold_36);
   String time = timeClient.getHours() + ":" + timeClient.getMinutes();
   ui.drawString(120, 56, time);
-  drawSeparator(65);
 }
 
 // draws current weather information
@@ -449,13 +320,12 @@ void drawCurrentWeather() {
   tft.setFont(&ArialRoundedMTBold_36);
   ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
   ui.setTextAlignment(RIGHT);
-  String degreeSign = "F";
+  String degreeSign = ".F";
   if (current_IS_METRIC) {
     degreeSign = ".C";
   }
   String temp = wunderground.getCurrentTemp() + degreeSign;
   ui.drawString(220, 125, temp);
-  drawSeparator(135);
 
 }
 
@@ -464,7 +334,6 @@ void drawForecast() {
   drawForecastDetail(10, 165, 0);
   drawForecastDetail(95, 165, 2);
   drawForecastDetail(180, 165, 4);
-  drawSeparator(165 + 65 + 10);
 }
 
 // helper for the forecast columns
@@ -520,7 +389,6 @@ void drawTemp() {
   ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
 
   float h = dht.readHumidity();
-  // Read temperature as Celsius (the default)
   float t = dht.readTemperature();
 
   
@@ -548,32 +416,41 @@ void drawTemp() {
 
 // Helper function, should be part of the weather station library and should disappear soon
 String getMeteoconIcon(String iconText) {
-  if (iconText == "F") return "chanceflurries";
-  if (iconText == "Q") return "chancerain";
-  if (iconText == "W") return "chancesleet";
-  if (iconText == "V") return "chancesnow";
-  if (iconText == "S") return "chancetstorms";
-  if (iconText == "B") return "clear";
-  if (iconText == "Y") return "cloudy";
-  if (iconText == "F") return "flurries";
-  if (iconText == "M") return "fog";
+
+  if (iconText == "0") return "tstorms";
+  if (iconText == "B") return "sunny";
   if (iconText == "E") return "hazy";
-  if (iconText == "Y") return "mostlycloudy";
+  if (iconText == "F") return "flurries";
+  if (iconText == "H") return "mostlysunny";
+  if (iconText == "J") return "partlysunny";
+  if (iconText == "M") return "fog";
+  if (iconText == "Q") return "chancerain";
+  if (iconText == "R") return "rain";
+  if (iconText == "S") return "chancetstorms";
+  if (iconText == "V") return "chancesnow";
+  if (iconText == "W") return "snow";
+  if (iconText == "Y") return "cloudy";
+  
+  /*if (iconText == "0") return "tstorms";
+  if (iconText == "B") return "clear";
+  if (iconText == "B") return "sunny";
+  if (iconText == "E") return "hazy";
+  if (iconText == "F") return "flurries";
+  if (iconText == "F") return "chanceflurries";
   if (iconText == "H") return "mostlysunny";
   if (iconText == "H") return "partlycloudy";
   if (iconText == "J") return "partlysunny";
-  if (iconText == "W") return "sleet";
+  if (iconText == "M") return "fog";
+  if (iconText == "Q") return "chancerain";
   if (iconText == "R") return "rain";
+  if (iconText == "S") return "chancetstorms";
+  if (iconText == "V") return "chancesnow";
+  if (iconText == "W") return "chancesleet";
+  if (iconText == "W") return "sleet";
   if (iconText == "W") return "snow";
-  if (iconText == "B") return "sunny";
-  if (iconText == "0") return "tstorms";
+  if (iconText == "Y") return "cloudy";
+  if (iconText == "Y") return "mostlycloudy";*/
   
-
   return "unknown";
-}
-
-// if you want separators, uncomment the tft-line
-void drawSeparator(uint16_t y) {
-   //tft.drawFastHLine(10, y, 240 - 2 * 10, 0x4228);
 }
 
