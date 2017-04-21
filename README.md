@@ -47,6 +47,10 @@ git clone https://github.com/ismailnguyen/WeatherStation.git
 2. Install `WiFiManager`
 3. Install `Adafruit NeoPixel`
 4. Install `elapsedMillis`
+5. Install `Weather Station Library`
+6. Install `Adafruit ILI9341`
+7. Install `Adafruit GFX`
+8. Install `WifiManager`
 
 ### Upload `WeatherStation` project to your Arduino
 
@@ -96,6 +100,9 @@ D3  | D4
 
 
 ## Sources
-https://github.com/esp8266/Arduino 
-http://oleddisplay.squix.ch/
-https://github.com/tzapu/WiFiManager
+- [Original Projet Inspiration](https://github.com/squix78/esp8266-weather-station-color)
+- [ESP8266 Weather Library](https://github.com/squix78/esp8266-weather-station)
+- [Adafruit Unified Sensor](https://github.com/adafruit/Adafruit_Sensor)
+- [Arduino core for ESP8266](https://github.com/esp8266/Arduino)
+- [Font for arduino screen](http://oleddisplay.squix.ch)
+- [Wifi Manager](https://github.com/tzapu/WiFiManager)
