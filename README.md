@@ -86,6 +86,14 @@ D5 | SCK
 3V3 | LED
 
 
+Weemos D1 Mini | DHT (Temperature and Humidity)
+--- | --- 
+3V3 | 3V3
+GND | GND
+D3  | D4
+
+
+
 
 ## Sources
 https://github.com/esp8266/Arduino 
