@@ -61,6 +61,13 @@ See more at http://blog.squix.ch
 // HOSTNAME for OTA update
 #define HOSTNAME "ESP8266-OTA-"
 
+// Initialisation of default settings from HTML setting screen
+String current_WUNDERGRROUND_API_KEY = WUNDERGRROUND_API_KEY;
+String current_WUNDERGROUND_CITY = WUNDERGROUND_CITY;
+String current_WUNDERGROUND_CITY_CODE = WUNDERGROUND_CITY_CODE;
+float current_UTC_OFFSET = UTC_OFFSET;
+boolean current_IS_METRIC = IS_METRIC;
+
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 GfxUi ui = GfxUi(&tft);
 
@@ -70,7 +77,7 @@ WebResource webResource;
 TimeClient timeClient(UTC_OFFSET);
 
 // Set to false, if you prefere imperial/inches, Fahrenheit
-WundergroundClient wunderground(IS_METRIC);
+WundergroundClient wunderground(current_IS_METRIC);
 
 //declaring prototypes
 void configModeCallback (WiFiManager *myWiFiManager);
@@ -98,13 +105,6 @@ WiFiManager wifiManager;
 // Web server
 // Initialization with custom SSID
 ESP8266WebServer server(80);
-
-// Initialisation of default settings from HTML setting screen
-String current_WUNDERGRROUND_API_KEY = WUNDERGRROUND_API_KEY;
-String current_WUNDERGROUND_CITY = WUNDERGROUND_CITY;
-String current_WUNDERGROUND_CITY_CODE = WUNDERGROUND_CITY_CODE;
-float current_UTC_OFFSET = UTC_OFFSET;
-boolean current_IS_METRIC = IS_METRIC;
 
 String getHTML() {
     String updatedIndexHTML = html_index;
@@ -450,7 +450,7 @@ void drawCurrentWeather() {
   ui.setTextColor(ILI9341_CYAN, ILI9341_BLACK);
   ui.setTextAlignment(RIGHT);
   String degreeSign = "F";
-  if (IS_METRIC) {
+  if (current_IS_METRIC) {
     degreeSign = ".C";
   }
   String temp = wunderground.getCurrentTemp() + degreeSign;
